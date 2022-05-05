@@ -1,9 +1,15 @@
 import React, {useState} from 'react';
 import Conditions from '../conditions/Conditions';
+import classes from './Forecast.module.css';
 
 const Forecast = () => {
     const [responseObj, setResponseObj] = useState({});
-    function getForecast(){
+    const [city, setCity] = useState('');
+    const [unit, setUnit] = useState('metric');
+    const uriEncodedCity = encodeURIComponent(city);
+
+    function getForecast(e){
+        e.preventDefault();
         const options = {
 	        method: 'GET',
 	        headers: {
@@ -12,7 +18,7 @@ const Forecast = () => {
 	        }
         };
 
-        fetch('https://community-open-weather-map.p.rapidapi.com/weather?q=Delhi', options)
+        fetch(`https://community-open-weather-map.p.rapidapi.com/weather?units=${unit}&q=${uriEncodedCity}`, options)
 	    .then(response => response.json())
 	    .then(response => setResponseObj(response))
 	    .catch(err => console.error(err));
@@ -22,9 +28,21 @@ const Forecast = () => {
     return (<div>
            <h2>Find Current Weather Conditions</h2>
            <div>
-               {JSON.stringify(responseObj)}
+               
            </div>
-           <button onClick={getForecast}>Get Forecast</button>
+
+           <form onSubmit = {getForecast}>
+               <input className={classes.TextInput} type = "text" placeholder = "Enter city" value = {city} onChange = {(e) => setCity(e.target.value)}/>
+               <label className= {classes.Radio}>
+                   <input type = "radio" name = "units" checked = {unit === "imperial"} value = "imperial" onChange = {(e) => setUnit(e.target.value)}/>
+                   Fahrenheit
+                </label>
+                <label className = {classes.Radio}>
+                    <input type = "radio" name = "units" checked = {unit === "metric"} value = "metric" onChange = {(e) => setUnit(e.target.value)} />
+                    Celsius
+                </label>
+                <button className = {classes.Button} type = "submit" > Get Forecast</button>
+           </form>
            <Conditions responseObj = {responseObj} />
        </div>)
 }
