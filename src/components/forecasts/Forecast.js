@@ -7,9 +7,20 @@ const Forecast = () => {
     const [city, setCity] = useState('');
     const [unit, setUnit] = useState('metric');
     const uriEncodedCity = encodeURIComponent(city);
+    const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(false);
+
 
     function getForecast(e){
         e.preventDefault();
+
+        if(city.length === 0){
+            return setError(true);
+        }
+
+        setError(false);
+        setResponseObj({});
+
         const options = {
 	        method: 'GET',
 	        headers: {
@@ -20,8 +31,21 @@ const Forecast = () => {
 
         fetch(`https://community-open-weather-map.p.rapidapi.com/weather?units=${unit}&q=${uriEncodedCity}`, options)
 	    .then(response => response.json())
-	    .then(response => setResponseObj(response))
-	    .catch(err => console.error(err));
+	    .then(response => {
+
+            if(response.cod !== 200){
+                throw new Error();
+            }
+            setResponseObj(response);
+            setLoading(false);
+        
+        })
+	    .catch(err => {
+            setError(true);
+            setLoading(false);
+            
+            console.error(err);
+        });
 
     }
 
@@ -43,7 +67,7 @@ const Forecast = () => {
                 </label>
                 <button className = {classes.Button} type = "submit" > Get Forecast</button>
            </form>
-           <Conditions responseObj = {responseObj} />
+           <Conditions responseObj = {responseObj}  error = {error} loading = {loading}/>
        </div>)
 }
 

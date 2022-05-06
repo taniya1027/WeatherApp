@@ -3,7 +3,10 @@ import classes from "./Conditions.module.css";
 
 const Conditions = (props) => {
 
-    return (<div className= {classes.Wrapper}>
+    return (<div>
+    <div className= {classes.Wrapper}>
+        {props.error && <small className = {classes.Small}>Please enter a valid city</small>}
+        {props.loading && <div classname = {classes.Loader}>Loading..</div>}
         {props.responseObj.cod === 200 ?
                <div>
                    <p><strong>{props.responseObj.name}</strong></p>
@@ -12,7 +15,9 @@ const Conditions = (props) => {
            : null
         }
 
-    </div>)
+    </div>
+    </div>
+    )
 
 }
 
